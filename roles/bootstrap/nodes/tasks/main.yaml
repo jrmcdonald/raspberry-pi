@@ -1,0 +1,40 @@
+- name: Configure UFW
+  block:
+    - name: Allow traffic on tcp port
+      ufw: rule=allow port={{ item }} proto=tcp
+      with_items:
+        - ssh
+        - http
+        - https
+        - '53'
+        - '81'
+        - '3218'
+        - '8122'
+
+    - name: Allow traffic on udp port
+      ufw: rule=allow port={{ item }} proto=udp
+      with_items:
+        - '53'
+        - '67'
+
+    - name: Enable UFW with default deny
+      ufw: state=enabled default=deny
+
+- name: Allow IP Forwarding for Docker
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    sysctl_set: yes
+
+- name: Install packages
+  apt:
+    pkg:
+    - tmux
+    - unzip
+    - python3-pip
+
+- name: Install python packages
+  pip:
+    name:
+      - docker
+#      - docker-compose

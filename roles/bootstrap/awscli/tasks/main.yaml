@@ -1,0 +1,20 @@
+- name: Download awscliv2 installer
+  ansible.builtin.unarchive:
+    src: https://awscli.amazonaws.com/awscli-exe-linux-aarch64.zip
+    dest: /tmp
+    remote_src: yes
+    creates: /tmp/aws
+    mode: 0755
+
+- name: Run the installer
+  ansible.builtin.command:
+  args:
+    cmd: /tmp/aws/install
+    creates: /usr/local/bin/aws
+  become: true
+  register: aws_install
+
+- name: Show installer output
+  ansible.builtin.debug:
+    var: aws_install
+    verbosity: 2

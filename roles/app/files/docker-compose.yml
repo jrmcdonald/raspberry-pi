@@ -1,0 +1,63 @@
+version: "3"
+
+volumes:
+  homeassistant-data:
+  homeassistant-configurator-data:
+  proxy-data:
+  pihole-data:
+
+services:
+
+  backup:
+    container_name: backup
+    image: "offen/docker-volume-backup:latest"
+    env_file: .backup.env
+    volumes:
+      - homeassistant-data:/backup/homeassistant-data:ro
+      - proxy-data:/backup/proxy-data:ro
+      # - pihole-data:/backup/pihole-data:ro
+    restart: unless-stopped
+
+  homeassistant:
+    container_name: homeassistant
+    image: "ghcr.io/home-assistant/home-assistant:stable"
+    volumes:
+      - homeassistant-data:/config
+      - /etc/localtime:/etc/localtime:ro
+    privileged: true
+    network_mode: host
+    restart: unless-stopped
+
+  homeassistant-configurator:
+    image: "causticlab/hass-configurator-docker:latest"
+    volumes:
+      - homeassistant-data:/config
+      - homeassistant-configurator-data:/hass-config
+    network_mode: host
+    restart: always
+
+  #  pihole:
+  #    container_name: pihole
+  #    image: pihole/pihole:latest
+  #    ports:
+  #      - "53:53/tcp"
+  #      - "53:53/udp"
+  #      - "67:67/udp"
+  #      - "8122:80/tcp"
+  #    environment:
+  #      TZ: "Europe/London"
+  #    volumes:
+  #      - pihole-data:/etc/pihole/
+  #      - pihole-data:/etc/dnsmasq.d/
+  #    cap_add:
+  #      - NET_ADMIN
+  #    restart: unless-stopped
+
+  proxy:
+    container_name: proxy
+    image: "jc21/nginx-proxy-manager:latest"
+    volumes:
+      - proxy-data:/data
+      - proxy-data:/etc/letsencrypt
+    network_mode: host
+    restart: unless-stopped

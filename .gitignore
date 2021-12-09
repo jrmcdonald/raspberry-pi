@@ -1,0 +1,14 @@
+# IDEs
+.idea
+
+# Ignore Ansible Files
+ansible_collections/
+*.retry
+**/plugins/
+**/production
+**/terraform-outputs.yaml
+
+# Distribution / packaging
+dist/
+
+venv/

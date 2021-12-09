@@ -1,0 +1,10 @@
+---
+## Ansible Vars
+ansible_python_interpreter: /usr/bin/python3
+
+## Backup Vars
+aws_region: eu-west-1
+aws_backup_bucket: qwyck-pi-backup-bucket
+aws_backup_group: qwyck-pi-backup-users
+aws_backup_policy: qwyck-pi-backup-policy
+aws_backup_user: qwyck-pi-backup-user

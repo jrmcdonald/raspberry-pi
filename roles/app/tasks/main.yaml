@@ -1,0 +1,19 @@
+- name: Copy Docker Compose ENV
+  ansible.builtin.template:
+    src: ../templates/backup.env.j2
+    dest: /home/admin/.backup.env
+    mode: 0755
+    owner: admin
+    group: admin
+
+- name: Copy Docker Compose YAML
+  ansible.builtin.copy:
+    src: ../files/docker-compose.yml
+    dest: /home/admin/docker-compose.yml
+    mode: 0755
+    owner: admin
+    group: admin
+
+- name: Deploy Docker Compose Stack
+  community.docker.docker_compose:
+    project_src: /home/admin

@@ -1,0 +1,55 @@
+- name: Build S3 Backup Location
+  hosts: localhost
+  connection: local
+  become: false
+  roles:
+    - { role: bootstrap/backup, tags: always }
+
+- name: Configure Local Settings
+  hosts: localhost
+  connection: local
+  become: false
+  roles:
+    - { role: local/known-hosts, tags: local }
+
+- name: Bootstrap Required Users
+  hosts: all
+  remote_user: ubuntu
+  become: true
+  gather_facts: false
+  roles:
+    - { role: bootstrap/users, tags: users }
+
+- name: Harden Nodes
+  hosts: all
+  remote_user: deployer
+  become: true
+  roles:
+    - { role: dev-sec.os-hardening, tags: hardening }
+    - { role: dev-sec.ssh-hardening, tags: hardening }
+
+- name: Bootstrap Nodes
+  hosts: all
+  remote_user: deployer
+  become: true
+  roles:
+    - { role: bootstrap/nodes, tags: nodes }
+    - { role: bootstrap/awscli, tags: nodes }
+
+- name: Configure Docker
+  hosts: all
+  remote_user: deployer
+  become: true
+  roles:
+    - { role: geerlingguy.docker, tags: docker }
+  vars:
+    docker_apt_arch: arm64
+    docker_compose_version: "v2.2.1"
+    docker_compose_url: https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-linux-aarch64
+
+- name: Deploy Application Stack
+  hosts: all
+  remote_user: deployer
+  become: true
+  roles:
+    - { role: app, tags: app }

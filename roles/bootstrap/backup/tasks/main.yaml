@@ -1,0 +1,40 @@
+- name: Create Backup Bucket
+  amazon.aws.s3_bucket:
+    name: '{{ aws_backup_bucket }}'
+    state: present
+    region: '{{ aws_region }}'
+    encryption: AES256
+    versioning: true
+    public_access:
+      block_public_acls: true
+      ignore_public_acls: true
+      block_public_policy: true
+      restrict_public_buckets: true
+
+- name: Create IAM User
+  community.aws.iam_user:
+    name: '{{ aws_backup_user }}'
+    state: present
+
+- name: Create IAM Access Key
+  community.aws.iam_access_key:
+    user_name: '{{ aws_backup_user }}'
+    rotate_keys: true
+    state: present
+  register: aws_backup_user_credentials
+
+- name: Create IAM Managed Policy
+  community.aws.iam_managed_policy:
+    policy_name: '{{ aws_backup_bucket }}'
+    policy: "{{ lookup('template', 'policy.json.j2') }}"
+    state: present
+  register: aws_backup_user_policy
+
+- name: Create IAM Group
+  community.aws.iam_group:
+    name: '{{ aws_backup_group }}'
+    managed_policies:
+      - '{{ aws_backup_user_policy.policy.arn }}'
+    users:
+      - '{{ aws_backup_user }}'
+    state: present

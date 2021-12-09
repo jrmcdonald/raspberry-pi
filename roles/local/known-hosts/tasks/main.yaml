@@ -1,0 +1,29 @@
+- name: Check if known hosts dir exists
+  stat: "path={{ ssh_known_hosts_dir }}"
+  register: ssh_known_hosts_dir_exists
+
+- name: Make sure the known hosts dir exists
+  file:
+    path: "{{ ssh_known_hosts_dir }}"
+    state: directory
+    mode: 0700
+  when: not ssh_known_hosts_dir_exists.stat.exists
+
+- name: Make sure the known hosts file exists
+  copy:
+    content: ""
+    dest: "{{ ssh_known_hosts_file }}"
+    force: false
+    mode: preserve
+
+- name: Remove existing known_hosts entries
+  command: "ssh-keygen -f {{ ssh_known_hosts_file }} -R {{ hostvars[item].ansible_host }}"
+  with_items: "{{ ssh_known_hosts }}"
+  changed_when: false
+  check_mode: false
+
+- name: Scan the public keys for all hosts
+  shell: "{{ ssh_known_hosts_command }} {{ hostvars[item].ansible_host }} >> {{ ssh_known_hosts_file }}"
+  with_items: "{{ ssh_known_hosts }}"
+  changed_when: false
+  check_mode: false

@@ -1,0 +1,13 @@
+---
+roles:
+  - name: dev-sec.os-hardening
+  - name: dev-sec.ssh-hardening
+  - name: geerlingguy.docker
+
+collections:
+  - name: amazon.aws
+    version: 2.1.0
+  - name: community.aws
+    version: 2.1.0
+  - name: community.docker
+    version: 2.0.1
