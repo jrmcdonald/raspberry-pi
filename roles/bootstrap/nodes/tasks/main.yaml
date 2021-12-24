@@ -10,12 +10,14 @@
         - '81'
         - '3218'
         - '8122'
+        - '21063'
 
     - name: Allow traffic on udp port
       ufw: rule=allow port={{ item }} proto=udp
       with_items:
         - '53'
         - '67'
+        - '5353'
 
     - name: Enable UFW with default deny
       ufw: state=enabled default=deny
