@@ -34,6 +34,8 @@
     - tmux
     - unzip
     - python3-pip
+    - bluez
+    - pi-bluetooth
 
 - name: Install python packages
   pip:
